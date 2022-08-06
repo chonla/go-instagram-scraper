@@ -72,7 +72,7 @@ func main() {
 		return c.NoContent(http.StatusNotFound)
 	})
 
-	logrus.Printf("Intagram tag scraper for hashtags \"%s\"\n", tagNames)
-	logrus.Printf("Service is listening on :%s\n", listenPort)
+	logrus.Printf("Intagram tag scraper for hashtags \"%s\"", tagNames)
+	logrus.Printf("Service is listening on :%s", listenPort)
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", listenPort)))
 }
