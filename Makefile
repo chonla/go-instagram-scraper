@@ -1,5 +1,5 @@
 build:
-	docker build -t chonla/instagram-scraper:1.0.0 -t chonla/instagram-scraper:latest .
+	docker build --platform linux/amd64 -t chonla/instagram-scraper:1.0.0 -t chonla/instagram-scraper:latest .
 
 push:
 	docker push chonla/instagram-scraper:1.0.0
