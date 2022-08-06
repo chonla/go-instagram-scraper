@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"instagram-scraper/models"
+	"os"
 	"strings"
 
 	"github.com/gocolly/colly"
+	"github.com/gocolly/colly/debug"
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,14 +30,20 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 		options = append(options, colly.UserAgent(t.userAgent))
 	}
 
+	if os.Getenv("LOG_LEVEL") == "debug" {
+		options = append(options, colly.Debugger(&debug.LogDebugger{}))
+	}
+
 	c := colly.NewCollector(options...)
 
 	var sharedData *models.SharedData
 	var err error
 
 	c.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("X-Requested-With", "XMLHttpRequest")
-		r.Headers.Set("Referrer", "https://www.instagram.com/explore/tags/"+tag)
+		// r.Headers.Set("X-Requested-With", "XMLHttpRequest")
+		// r.Headers.Set("Referrer", "https://www.instagram.com/explore/tags/"+tag)
+
+		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 		if r.Ctx.Get("gis") != "" {
 			gis := fmt.Sprintf("%s:%s", r.Ctx.Get("gis"), r.Ctx.Get("variables"))
 			h := md5.New()
@@ -58,6 +66,8 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 					logrus.Debug("This is what I've got")
 					b, _ := json.Marshal(sharedData)
 					logrus.Debug(string(b))
+					logrus.Debug("from")
+					logrus.Debug(sharedDataText)
 				}
 			} else {
 				logrus.Debug("Shared data not found in the following context")
@@ -71,7 +81,8 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 	var instagramPosts []models.InstagramPost
 	err = nil
 
-	c.Visit(fmt.Sprintf("https://www.instagram.com/explore/tags/%s/", tag))
+	scrapedUrl := fmt.Sprintf("https://www.instagram.com/explore/tags/%s/", tag)
+	c.Visit(scrapedUrl)
 
 	if sharedData != nil {
 		instagramPosts = sharedData.ToInstagramPosts(maxResult)
