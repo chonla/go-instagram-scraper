@@ -53,6 +53,10 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 			err = json.Unmarshal([]byte(sharedDataText), &sharedData)
 			if err != nil {
 				logrus.Debugf("Unable to unmarshal JSON %s", sharedDataText)
+			} else {
+				logrus.Debug("This is what I've got")
+				b, _ := json.Marshal(sharedData)
+				logrus.Debug(string(b))
 			}
 		} else {
 			logrus.Debug("Shared data not found in the following context")
