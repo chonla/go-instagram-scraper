@@ -34,6 +34,8 @@ func main() {
 	}
 	logrus.Println("Available tags:", tagNames)
 
+	userAgent := os.Getenv("USER_AGENT")
+
 	logFormat := &logrus.TextFormatter{
 		DisableLevelTruncation: true,
 		FullTimestamp:          true,
@@ -57,7 +59,7 @@ func main() {
 		found := lo.Contains(tags, tagName)
 
 		if found {
-			tagscraper := scraper.NewTag()
+			tagscraper := scraper.NewTag(userAgent)
 			data, err := tagscraper.Scrape(tagName, maxResult)
 			if err != nil {
 				logrus.Error(err)

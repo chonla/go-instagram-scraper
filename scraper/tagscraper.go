@@ -11,17 +11,24 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type TagScraper struct{}
+type TagScraper struct {
+	userAgent string
+}
 
-func NewTag() *TagScraper {
-	return &TagScraper{}
+func NewTag(ua string) *TagScraper {
+	return &TagScraper{
+		userAgent: ua,
+	}
 }
 
 func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost, error) {
-	c := colly.NewCollector(
-		//colly.CacheDir("./_instagram_cache/"),
-		colly.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"),
-	)
+	options := []func(*colly.Collector){}
+
+	if t.userAgent != "" {
+		options = append(options, colly.UserAgent(t.userAgent))
+	}
+
+	c := colly.NewCollector(options...)
 
 	var sharedData *models.SharedData
 	var err error
