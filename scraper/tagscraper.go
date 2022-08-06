@@ -48,8 +48,12 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 	c.OnHTML("script:not([src])", func(e *colly.HTMLElement) {
 		sharedDataIndex := strings.Index(e.Text, "window._sharedData = ")
 		if sharedDataIndex > -1 {
+			logrus.Debug("Shared data found")
 			sharedDataText := e.Text[sharedDataIndex+21 : len(e.Text)-1]
 			err = json.Unmarshal([]byte(sharedDataText), &sharedData)
+			if err != nil {
+				logrus.Debugf("Unable to unmarshal JSON %s", sharedDataText)
+			}
 		} else {
 			logrus.Debug("Shared data not found in the following context")
 			logrus.Debug(e.Text)
