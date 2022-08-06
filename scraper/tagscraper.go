@@ -20,7 +20,7 @@ func NewTag() *TagScraper {
 func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost, error) {
 	c := colly.NewCollector(
 		//colly.CacheDir("./_instagram_cache/"),
-		colly.UserAgent("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"),
+		colly.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"),
 	)
 
 	var sharedData *models.SharedData
