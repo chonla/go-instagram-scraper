@@ -17,7 +17,7 @@ const defaultPort = "1444"
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file, use local environment variables instead.")
 	}
 	tagName := os.Getenv("TAG")
 	maxResult, _ := strconv.ParseInt("0"+os.Getenv("MAX_SCRAPED_RESULT"), 10, 64)
