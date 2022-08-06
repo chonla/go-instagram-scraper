@@ -82,6 +82,7 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 	err = nil
 
 	scrapedUrl := fmt.Sprintf("https://www.instagram.com/explore/tags/%s/", tag)
+	logrus.Debugf("Scraping %s", scrapedUrl)
 	c.Visit(scrapedUrl)
 
 	if sharedData != nil {
