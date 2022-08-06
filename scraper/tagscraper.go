@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
+	"github.com/sirupsen/logrus"
 )
 
 type TagScraper struct{}
@@ -42,6 +43,9 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 		if sharedDataIndex > -1 {
 			sharedDataText := e.Text[sharedDataIndex+21 : len(e.Text)-1]
 			err = json.Unmarshal([]byte(sharedDataText), &sharedData)
+		} else {
+			logrus.Debug("Shared data not found in the following context")
+			logrus.Debug(e.Text)
 		}
 	})
 
