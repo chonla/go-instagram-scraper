@@ -3,10 +3,15 @@ package scraper
 import (
 	"crypto/md5"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"instagram-scraper/models"
+	"math/rand"
+	"net/http"
+	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gocolly/colly"
 	"github.com/gocolly/colly/debug"
@@ -35,6 +40,17 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 	}
 
 	c := colly.NewCollector(options...)
+
+	if os.Getenv("PROXIES") != "" {
+		proxies, err := t.randomProxy(strings.Split(os.Getenv("PROXIES"), ",")...)
+		if err == nil {
+			c.SetProxyFunc(proxies)
+			logrus.Debug("Proxies settings are detected and applied")
+			logrus.Debug(os.Getenv("PROXIES"))
+		} else {
+			logrus.Error(err)
+		}
+	}
 
 	var sharedData *models.SharedData
 	var err error
@@ -90,4 +106,27 @@ func (t *TagScraper) Scrape(tag string, maxResult int64) ([]models.InstagramPost
 	}
 
 	return instagramPosts, err
+}
+
+func (t *TagScraper) randomProxy(urls ...string) (colly.ProxyFunc, error) {
+	proxies := []*url.URL{}
+	for _, u := range urls {
+		parsedU, err := url.Parse(u)
+		if err != nil {
+			return nil, err
+		}
+		proxies = append(proxies, parsedU)
+	}
+
+	if len(proxies) > 0 {
+		seed := rand.NewSource(time.Now().UnixNano())
+		randomizer := rand.New(seed)
+		proxI := randomizer.Intn(len(proxies))
+		return func(pr *http.Request) (*url.URL, error) {
+			logrus.Debug("Scraping target through proxy -> ", proxies[proxI])
+			return proxies[proxI], nil
+		}, nil
+	} else {
+		return nil, errors.New("No proxy available")
+	}
 }
